@@ -1,0 +1,29 @@
+<resources>
+    <!-- Base application theme -->
+    <style name="Theme.GreenHub" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/green_primary</color>
+        <item name="colorPrimaryVariant">@color/green_dark</color>
+        <item name="colorOnPrimary">@color/white</color>
+        <item name="colorSecondary">@color/teal_200</color>
+        <item name="colorSecondaryVariant">@color/teal_700</color>
+        <item name="colorOnSecondary">@color/black</color>
+        <item name="android:windowBackground">@color/background</color>
+        <item name="android:statusBarColor">@color/green_primary</color>
+    </style>
+
+    <!-- Toolbar theme -->
+    <style name="Theme.GreenHub.NoActionBar" parent="Theme.GreenHub">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <!-- Dialog theme -->
+    <style name="Theme.GreenHub.Dialog" parent="Theme.MaterialComponents.Dialog">
+        <item name="colorPrimary">@color/green_primary</color>
+    </style>
+
+    <!-- Bottom sheet theme -->
+    <style name="Theme.GreenHub.BottomSheet" parent="Theme.MaterialComponents.Light.BottomSheetDialog">
+        <item name="colorPrimary">@color/green_primary</color>
+    </style>
+</resources>

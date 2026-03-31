@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">GreenHub Launcher</string>
+    <string name="file_manager">File Manager</string>
+    <string name="calculator">Calculator</string>
+    <string name="browser">Browser</string>
+    <string name="notepad">Notepad</string>
+    <string name="video_downloader">Video Downloader</string>
+    <string name="music_player">Music Player</string>
+    <string name="phone">Phone</string>
+    <string name="contacts">Contacts</string>
+    <string name="settings">Settings</string>
+</resources>
