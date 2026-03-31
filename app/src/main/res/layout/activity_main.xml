@@ -1,25 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recycler_apps"
+    <ScrollView
+        android:id="@+id/app_list_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <View
-        android:id="@+id/dots_container"
+    <LinearLayout
+        android:id="@+id/tools_container"
         android:layout_width="match_parent"
-        android:layout_height="24dp" />
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/tools_pager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
 
     <EditText
         android:id="@+id/search_box"

@@ -1,7 +1,8 @@
 package com.glauncher.launcher;
 
 import android.Manifest;
-import android.app.AppOpsManager;
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -16,6 +17,7 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -23,33 +25,25 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.glauncher.launcher.adapters.AppAdapter;
-import com.glauncher.launcher.adapters.ToolsPagerAdapter;
+import com.glauncher.launcher.R;
+import com.glauncher.launcher.adapters.TextAppAdapter;
+import com.glauncher.launcher.adapters.TextToolsPagerAdapter;
 import com.glauncher.launcher.models.AppInfo;
-import android.content.Intent;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements AppAdapter.OnAppClickListener {
+public class MainActivity extends AppCompatActivity implements TextAppAdapter.OnAppClickListener {
 
-    private RecyclerView recyclerView;
-    private AppAdapter appAdapter;
-    private List<AppInfo> appList = new ArrayList<>();
-    private List<AppInfo> filteredList = new ArrayList<>();
+    private LinearLayout appListContainer;
+    private TextToolsPagerAdapter toolsPagerAdapter;
+    private LinearLayout toolsContainer;
     private EditText searchBox;
-    private ViewPager2 toolsPager;
-    private LinearLayout dotsContainer;
     private PackageManager pm;
 
     private static final int PERMISSION_REQUEST_CODE = 100;
@@ -76,12 +70,9 @@ public class MainActivity extends AppCompatActivity implements AppAdapter.OnAppC
     }
 
     private void initViews() {
-        recyclerView = findViewById(R.id.recycler_apps);
+        appListContainer = findViewById(R.id.app_list_container);
         searchBox = findViewById(R.id.search_box);
-        toolsPager = findViewById(R.id.tools_pager);
-        dotsContainer = findViewById(R.id.dots_container);
-
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 4));
+        toolsContainer = findViewById(R.id.tools_container);
     }
 
     private void checkPermissions() {
@@ -118,53 +109,38 @@ public class MainActivity extends AppCompatActivity implements AppAdapter.OnAppC
 
                 // Don't show this launcher in the app list
                 if (!packageName.equals(getPackageName())) {
-                    AppInfo appInfo = new AppInfo(appName, packageName, ri.activityInfo.name, ri.loadIcon(pm));
+                    AppInfo appInfo = new AppInfo(appName, packageName, ri.activityInfo.name, null);
                     appList.add(appInfo);
                 }
             }
 
             Collections.sort(appList, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
-            filteredList.clear();
-            filteredList.addAll(appList);
-
-            new Handler(Looper.getMainLooper()).post(() -> {
-                appAdapter = new AppAdapter(MainActivity.this, filteredList, MainActivity.this);
-                recyclerView.setAdapter(appAdapter);
-            });
+            appListContainer.removeAllViews();
+            for (AppInfo app : appList) {
+                TextView appView = new TextView(this);
+                appView.setText(app.getName());
+                appView.setPadding(8, 8, 8, 8);
+                appView.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onAppClick(app);
+                    }
+                });
+                appView.setOnLongClickListener(v -> {
+                    if (listener != null) {
+                        listener.onAppLongClick(app, appView);
+                    }
+                });
+                appListContainer.addView(appView);
+            }
         }).start();
     }
 
     private void setupToolsPager() {
-        ToolsPagerAdapter pagerAdapter = new ToolsPagerAdapter(this);
-        toolsPager.setAdapter(pagerAdapter);
-
-        toolsPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageSelected(int position) {
-                updateDots(position);
-            }
-        });
-
-        setupPagerDots(pagerAdapter.getItemCount());
-    }
-
-    private void setupPagerDots(int count) {
-        dotsContainer.removeAllViews();
-        for (int i = 0; i < count; i++) {
-            View dot = new View(this);
-            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(12, 12);
-            params.setMargins(4, 0, 4, 0);
-            dot.setLayoutParams(params);
-            dot.setBackgroundResource(i == 0 ? R.drawable.dot_active : R.drawable.dot_inactive);
-            dotsContainer.addView(dot);
-        }
-    }
-
-    private void updateDots(int position) {
-        for (int i = 0; i < dotsContainer.getChildCount(); i++) {
-            View dot = dotsContainer.getChildAt(i);
-            dot.setBackgroundResource(i == position ? R.drawable.dot_active : R.drawable.dot_inactive);
-        }
+        toolsPagerAdapter = new TextToolsPagerAdapter(this);
+        toolsContainer.removeAllViews();
+        toolsContainer.addView(toolsPagerAdapter.getFileManagerView());
+        toolsContainer.addView(toolsPagerAdapter.getNotepadView());
+        toolsContainer.addView(toolsPagerAdapter.getPermissionView());
     }
 
     private void setupSearch() {
@@ -183,19 +159,47 @@ public class MainActivity extends AppCompatActivity implements AppAdapter.OnAppC
     }
 
     private void filterApps(String query) {
-        filteredList.clear();
+        appListContainer.removeAllViews();
         if (query.isEmpty()) {
-            filteredList.addAll(appList);
-        } else {
-            String lowerQuery = query.toLowerCase();
             for (AppInfo app : appList) {
-                if (app.getName().toLowerCase().contains(lowerQuery)) {
-                    filteredList.add(app);
+                TextView appView = new TextView(this);
+                appView.setText(app.getName());
+                appView.setPadding(8, 8, 8, 8);
+                appView.setOnClickListener(v -> {
+                    if (listener != null) {
+                        listener.onAppClick(app);
+                    }
+                });
+                appView.setOnLongClickListener(v -> {
+                    if (listener != null) {
+                        listener.onAppLongClick(app, appView);
+                    }
+                });
+                appListContainer.addView(appView);
+            } else {
+                String lowerQuery = query.toLowerCase();
+                for (AppInfo app : appList) {
+                    if (app.getName().toLowerCase().contains(lowerQuery)) {
+                        TextView appView = new TextView(this);
+                        appView.setText(app.getName());
+                        appView.setPadding(8, 8, 8, 8);
+                        appView.setOnClickListener(v -> {
+                            if (listener != null) {
+                                listener.onAppClick(app);
+                            }
+                        });
+                        appView.setOnLongClickListener(v -> {
+                            if (listener != null) {
+                                listener.onAppLongClick(app, appView);
+                            }
+                        });
+                        appListContainer.addView(appView);
+                    }
                 }
             }
         }
-        if (appAdapter != null) {
-            appAdapter.notifyDataSetChanged();
+        if (listener != null) {
+            // Notify adapter of data changes (not needed for linear layout)
         }
     }
 
@@ -234,36 +238,34 @@ public class MainActivity extends AppCompatActivity implements AppAdapter.OnAppC
     }
 
     private void showAppOptions(AppInfo app, View anchorView) {
-        BottomSheetDialog dialog = new BottomSheetDialog(this, R.style.GreenDialog);
-        View sheetView = getLayoutInflater().inflate(R.layout.bottom_sheet_app_options, null);
-
-        sheetView.findViewById(R.id.option_open).setOnClickListener(v -> {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(app.getName());
+        builder.setMessage("Select an action:");
+        builder.setPositiveButton("Open", (dialog, which) -> {
             onAppClick(app);
             dialog.dismiss();
         });
-
-        sheetView.findViewById(R.id.option_info).setOnClickListener(v -> {
+        builder.setNegativeButton("App Info", (dialog, which) -> {
             showAppInfo(app);
             dialog.dismiss();
         });
-
-        sheetView.findViewById(R.id.option_uninstall).setOnClickListener(v -> {
+        builder.setNeutralButton("Uninstall", (dialog, which) -> {
             uninstallApp(app);
             dialog.dismiss();
         });
-
-        dialog.setContentView(sheetView);
-        dialog.show();
+        builder.show();
     }
 
     private void showAppInfo(AppInfo app) {
-        try {
-            Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-            intent.setData(Uri.parse("package:" + app.getPackageName()));
-            startActivity(intent);
-        } catch (Exception e) {
-            Toast.makeText(this, "Could not open app info", Toast.LENGTH_SHORT).show();
-        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("App Info");
+        builder.setMessage("Name: " + app.getName() + "\n" +
+                "Package: " + app.getPackageName() + "\n" +
+                "Class: " + app.getClassName());
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            dialog.dismiss();
+        });
+        builder.show();
     }
 
     private void uninstallApp(AppInfo app) {
