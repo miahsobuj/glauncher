@@ -4,73 +4,69 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.glauncher.launcher.R;
 import com.glauncher.launcher.models.AppInfo;
 
 import java.util.List;
 
-public class AppAdapter extends RecyclerView.Adapter<AppAdapter.AppViewHolder> {
+/**
+ * Adapter for displaying apps in a grid or list
+ * Used by the Launcher tool
+ */
+public class AppAdapter extends BaseAdapter {
 
     private final Context context;
-    private final List<AppInfo> appList;
-    private final OnAppClickListener listener;
+    private final List<AppInfo> apps;
 
-    public interface OnAppClickListener {
-        void onAppClick(AppInfo app);
-        void onAppLongClick(AppInfo app, View view);
-    }
-
-    public AppAdapter(Context context, List<AppInfo> appList, OnAppClickListener listener) {
+    public AppAdapter(Context context, List<AppInfo> apps) {
         this.context = context;
-        this.appList = appList;
-        this.listener = listener;
-    }
-
-    @NonNull
-    @Override
-    public AppViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_app, parent, false);
-        return new AppViewHolder(view);
+        this.apps = apps;
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AppViewHolder holder, int position) {
-        AppInfo app = appList.get(position);
-        holder.appName.setText(app.getName());
-        holder.appIcon.setImageDrawable(app.getIcon());
-
-        holder.itemView.setOnClickListener(v -> {
-            if (listener != null) {
-                listener.onAppClick(app);
-            }
-        });
-
-        holder.itemView.setOnLongClickListener(v -> {
-            if (listener != null) {
-                listener.onAppLongClick(app, holder.itemView);
-            }
-        });
+    public int getCount() {
+        return apps.size();
     }
 
     @Override
-    public int getItemCount() {
-        return appList.size();
+    public Object getItem(int position) {
+        return apps.get(position);
     }
 
-    public static class AppViewHolder extends RecyclerView.ViewHolder {
-        ImageView appIcon;
-        TextView appName;
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
 
-        public AppViewHolder(@NonNull View itemView) {
-            super(itemView);
-            appIcon = itemView.findViewById(R.id.app_icon);
-            appName = itemView.findViewById(R.id.app_name);
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder holder;
+        if (convertView == null) {
+            convertView = LayoutInflater.from(context).inflate(
+                    android.R.layout.simple_list_item_2, parent, false);
+            holder = new ViewHolder();
+            holder.icon = convertView.findViewById(android.R.id.icon);
+            holder.text1 = convertView.findViewById(android.R.id.text1);
+            holder.text2 = convertView.findViewById(android.R.id.text2);
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
+
+        AppInfo app = apps.get(position);
+        holder.text1.setText(app.getName());
+        holder.text2.setText(app.getPackageName());
+        holder.icon.setImageDrawable(app.getIcon());
+
+        return convertView;
+    }
+
+    private static class ViewHolder {
+        ImageView icon;
+        TextView text1;
+        TextView text2;
     }
 }
