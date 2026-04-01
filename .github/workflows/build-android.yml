@@ -21,13 +21,11 @@ jobs:
         distribution: 'temurin'
         cache: 'gradle'
 
-    - name: Validate Gradle wrapper
-      run: |
-        chmod +x gradlew
-        ./gradlew --version
+    - name: Validate Gradle installation
+      run: gradle --version
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug
+      run: gradle assembleDebug
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
@@ -37,7 +35,7 @@ jobs:
         retention-days: 30
 
     - name: Build Release APK
-      run: ./gradlew assembleRelease
+      run: gradle assembleRelease
 
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
