@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xmlns name="&#34;http://schemas.android.com/apk/res/android&#34;">
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <rules>
         <allow />
     </rules>
+</resources>
