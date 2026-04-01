@@ -24,8 +24,11 @@ jobs:
     - name: Validate Gradle installation
       run: gradle --version
 
-    - name: Build Debug APK
-      run: gradle assembleDebug
+    - name: Build Debug APK (with clean flags)
+      run: gradle assembleDebug --no-daemon --refresh-dependencies
+
+    - name: Build Release APK (with clean flags)
+      run: gradle assembleRelease --no-daemon --refresh-dependencies
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
@@ -33,9 +36,6 @@ jobs:
         name: debug-apk
         path: app/build/outputs/apk/debug/app-debug.apk
         retention-days: 30
-
-    - name: Build Release APK
-      run: gradle assembleRelease
 
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
