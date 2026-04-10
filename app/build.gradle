@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdk 34
+    compileSdkVersion 28
 
     defaultConfig {
         applicationId "com.glauncher.launcher"
-        minSdk 24
-        targetSdk 34
+        minSdkVersion 24
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0.0"
     }
