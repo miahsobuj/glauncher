@@ -6,7 +6,7 @@
     <string name="app_calculator">Calculator</string>
     <string name="app_notepad">Notepad</string>
     <string name="app_music_player">Music Player</string>
-    <string name="app_phone_contacts">Phone & Contacts</string>
+    <string name="app_phone_contacts">Phone &amp; Contacts</string>
     <string name="app_video_downloader">Video Downloader</string>
     <string name="action_settings">Settings</string>
 </resources>

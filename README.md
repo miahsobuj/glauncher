@@ -93,7 +93,18 @@ Output APKs located in: `app/build/outputs/apk/`
 [MIT License](LICENSE)
 
 ## 👤 Author
-- Your Name Here
+- Android Dev Setup
+
+## 📱 Latest Build Status
+- **Last Updated**: April 11, 2026
+- **Current Version**: 1.0.0 (Development)
+- **Build Status**: ✅ Ready for testing
+
+## 🔧 Development Setup
+1. Clone the repository: `git clone https://github.com/miahsobuj/glauncher.git`
+2. Open in Android Studio
+3. Ensure Java 17 and Android SDK 34 are installed
+4. Run `./gradlew assembleDebug` to build the debug APK
 
 ## 📁 Directory Structure
 ```
